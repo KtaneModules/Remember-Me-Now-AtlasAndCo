@@ -14,7 +14,18 @@ MonoBehaviour:
   id: rememberMeNow
   title: Remember Now Me
   author: AtlasAndCo
-  description: 
+  description: 'Remember Me Now 1.0
+
+    Aren''t you supposed to be remembering something?
+
+
+    Twitch Plays supported
+
+
+    Module ID: rememberMeNow
+
+
+    Created by: AtlasAndCo'
   version: 1.0
   outputFolder: build
-  previewImage: {fileID: 0}
+  previewImage: {fileID: 2800000, guid: 61fe6e6383cdbf6488bb3d2eb7585bfd, type: 3}
