@@ -17,6 +17,7 @@ public class RememberMeNowScript : MonoBehaviour
     [SerializeField] private GameObject[] ledArray;
     [SerializeField] private Material[] lightMaterials;
     [SerializeField] private GameObject[] colourblindText;
+    [SerializeField] private Light[] allLights;
     private string[] colourStrings = new string[] {"Red", "Blue", "Yellow", "Green", "Orange", "Purple", "Off"};
     private string[] lightColours = new string[] {"Off", "Off"};
     private Color[] colours = new Color[] {Color.red, Color.blue, Color.yellow, Color.green, new Color(1f, 0.6f, 0f), new Color(1f, 0f, 1f)};
@@ -50,6 +51,12 @@ public class RememberMeNowScript : MonoBehaviour
 
     void Start()
     {
+        float scalar = this.transform.lossyScale.x;
+        for (var i = 0; i < allLights.Length; i++)
+        {
+            allLights[i].range *= scalar;
+        }
+
         timerRef = StartCoroutine(NewNumberAndTimer(true));
     }
 
@@ -82,11 +89,11 @@ public class RememberMeNowScript : MonoBehaviour
         {
             displayText.text = displayText.text.Remove(i, 1).Insert(i, "-");
 
-            yield return new WaitForSecondsRealtime(0.5f);
+            yield return new WaitForSecondsRealtime(0.25f);
         }
 
         //Advances stage if requirement is met
-        if (acceptedNumbers.Count >= 10 || (rejectedNumbers.Count >= 15 && acceptedNumbers.Count >= 1))
+        if (acceptedNumbers.Count >= 1 && (acceptedNumbers.Count + rejectedNumbers.Count >= 12))
         {
             Debug.LogFormat("[Remember Me Now #{0}] {1}, switching to stage 2.", moduleId, acceptedNumbers.Count >= 10 ? "The current number of accepted numbers is equal to 10" : "The current number of rejected numbers is 15 and there is atleast 1 accepted number");
             stage = 2;
@@ -117,7 +124,7 @@ public class RememberMeNowScript : MonoBehaviour
         {
             displayText.text = displayText.text.Remove(i, 1).Insert(i, UnityEngine.Random.Range(0, 10).ToString());
 
-            yield return new WaitForSecondsRealtime(0.5f);
+            yield return new WaitForSecondsRealtime(0.25f);
         }
 
         //LED handler
@@ -159,13 +166,13 @@ public class RememberMeNowScript : MonoBehaviour
                 }
                 break;
             case "Blue":
-                isValidNumber = bombRef.GetStrikes() == 0;
+                isValidNumber = int.Parse(displayText.text) > 5000;
                 break;
             case "Yellow":
-                isValidNumber = CalcIsPrime(Mathf.FloorToInt(bombRef.GetTime() / 60f));
+                isValidNumber = acceptedNumbers.Count < rejectedNumbers.Count;
                 break;
             case "Green":
-                isValidNumber = acceptedNumbers.Count < rejectedNumbers.Count;
+                isValidNumber = displayText.text[0] != '0';
                 break;
             case "Orange":
                 isValidNumber = acceptedNumbers.Count % 2 == 0;
@@ -193,13 +200,13 @@ public class RememberMeNowScript : MonoBehaviour
                     }
                     break;
                 case "Blue":
-                    tempBool = bombRef.GetStrikes() == 0;
+                    tempBool = int.Parse(displayText.text) > 5000;
                     break;
                 case "Yellow":
-                    tempBool = CalcIsPrime(Mathf.FloorToInt(bombRef.GetTime() / 60f));
+                    tempBool = acceptedNumbers.Count < rejectedNumbers.Count;
                     break;
                 case "Green":
-                    tempBool = acceptedNumbers.Count < rejectedNumbers.Count;
+                    tempBool = displayText.text[0] != '0';
                     break;
                 case "Orange":
                     tempBool = acceptedNumbers.Count % 2 == 0;
@@ -244,8 +251,8 @@ public class RememberMeNowScript : MonoBehaviour
             }
         }
 
-        Debug.LogFormat("[Remember Me Now #{0}] There is {1} instance(s) of Remember Me Now. Timer set to {2}", moduleId, amountOfSameModules, amountOfSameModules * 30 + (delay ? 30 : 0));
-        timerText.text = (amountOfSameModules * 30 + (delay ? 30 : 0)).ToString();
+        Debug.LogFormat("[Remember Me Now #{0}] There is {1} instance(s) of Remember Me Now. Timer set to {2}", moduleId, amountOfSameModules, amountOfSameModules * 40 + (delay ? 45 : 0));
+        timerText.text = (amountOfSameModules * 40 + (delay ? 45 : 0)).ToString();
 
         if (timerText.text.Length == 2)
         {
@@ -280,22 +287,6 @@ public class RememberMeNowScript : MonoBehaviour
             }
         }
     }
-
-    bool CalcIsPrime(int number)
-    {
-        if (number == 1) return false;
-        if (number == 2) return true;
-
-        if (number % 2 == 0) return false; // Even number     
-
-        for (int i = 2; i < number; i++)
-        { // Advance from two to include correct calculation for '4'
-            if (number % i == 0) return false;
-        }
-
-        return true;
-    }
-
 
     //When a button is pushed
     void PressButton(KMSelectable pressedButton)
@@ -395,6 +386,12 @@ public class RememberMeNowScript : MonoBehaviour
                         else if (timerText.text.Length == 1)
                         {
                             timerText.text = "00" + timerText.text;
+                        }
+
+                        //Logging next number
+                        if (acceptedNumbers.Count != 0)
+                        {
+                            Debug.LogFormat("[Remember Me Now #{0}] The current number to submit is {1}.", moduleId, acceptedNumbers[0]);
                         }
                     }
                     else
