@@ -14,7 +14,7 @@ MonoBehaviour:
   id: rememberMeNow
   title: Remember Me Now
   author: AtlasAndCo
-  description: 'Remember Me Now 1.4.1
+  description: 'Remember Me Now 1.5
 
     Aren''t you supposed to be remembering something?
 
@@ -26,6 +26,6 @@ MonoBehaviour:
 
 
     Created by: AtlasAndCo'
-  version: 1.4.1
+  version: 1.5
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 61fe6e6383cdbf6488bb3d2eb7585bfd, type: 3}

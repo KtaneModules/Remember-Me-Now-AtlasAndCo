@@ -18,3 +18,7 @@
 
 1.4.1 Build Notes:
 -Fixed the manual showing the wrong time per module instance
+
+1.5 Build Notes:
+-Fixed a bug that caused inconsistent results when one of the LEDs was red on the first number during stage one
+-Added additional logging events

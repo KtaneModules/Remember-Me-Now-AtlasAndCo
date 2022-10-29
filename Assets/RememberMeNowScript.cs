@@ -162,7 +162,7 @@ public class RememberMeNowScript : MonoBehaviour
                 }
                 else
                 {
-                    isValidNumber = int.Parse(displayText.text) > 0;
+                    isValidNumber = false;
                 }
                 break;
             case "Blue":
@@ -281,6 +281,9 @@ public class RememberMeNowScript : MonoBehaviour
             if (timerText.text == "000")
             {
                 bombModuleRef.HandleStrike();
+
+                Debug.LogFormat("[Remember Me Now #{0}] The timer has ran out, clearing all remembered accepted and rejected numbers.", moduleId);
+
                 acceptedNumbers.Clear();
                 rejectedNumbers.Clear();
                 RestartTimer();
@@ -314,6 +317,11 @@ public class RememberMeNowScript : MonoBehaviour
                 if (!isValidNumber)
                 {
                     bombModuleRef.HandleStrike();
+                    Debug.LogFormat("[Remember Me Now #{0}] \"Accept\" was pressed incorrectly, {1} is being remembered as an accepted number.", moduleId, displayText.text);
+                }
+                else
+                {
+                    Debug.LogFormat("[Remember Me Now #{0}] \"Accept\" was pressed correctly, {1} is being remembered as an accepted number.", moduleId, displayText.text);
                 }
                 acceptedNumbers.Add(int.Parse(displayText.text));
                 RestartTimer();
@@ -375,6 +383,9 @@ public class RememberMeNowScript : MonoBehaviour
                     if (int.Parse(displayText.text) == acceptedNumbers[0])
                     {
                         acceptedNumbers.RemoveAt(0);
+
+                        Debug.LogFormat("[Remember Me Now #{0}] {1} submitted correctly, {2} more numbers to submit.", moduleId, displayText.text, acceptedNumbers.Count);
+
                         displayText.text = "----";
                         currentTypingIndex = 0;
                         timerText.text = acceptedNumbers.Count.ToString();
@@ -422,6 +433,11 @@ public class RememberMeNowScript : MonoBehaviour
                 if (isValidNumber)
                 {
                     bombModuleRef.HandleStrike();
+                    Debug.LogFormat("[Remember Me Now #{0}] \"Reject\" was pressed incorrectly, {1} is being remembered as an rejected number.", moduleId, displayText.text);
+                }
+                else
+                {
+                    Debug.LogFormat("[Remember Me Now #{0}] \"Reject\" was pressed correctly, {1} is being remembered as an rejected number.", moduleId, displayText.text);
                 }
                 rejectedNumbers.Add(int.Parse(displayText.text));
                 RestartTimer();
