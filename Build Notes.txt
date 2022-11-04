@@ -22,3 +22,7 @@
 1.5 Build Notes:
 -Fixed a bug that caused inconsistent results when one of the LEDs was red on the first number during stage one
 -Added additional logging events
+
+1.5.1 Build Notes:
+-Added logging events that were forgotten in the previous update
+-Made auto-solve step through the module instead of instantly solving it

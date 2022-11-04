@@ -95,7 +95,7 @@ public class RememberMeNowScript : MonoBehaviour
         //Advances stage if requirement is met
         if (acceptedNumbers.Count >= 1 && (acceptedNumbers.Count + rejectedNumbers.Count >= 12))
         {
-            Debug.LogFormat("[Remember Me Now #{0}] {1}, switching to stage 2.", moduleId, acceptedNumbers.Count >= 10 ? "The current number of accepted numbers is equal to 10" : "The current number of rejected numbers is 15 and there is atleast 1 accepted number");
+            Debug.LogFormat("[Remember Me Now #{0}] The amount of accepted numbers plus the amount of rejected numbers is greater than or equal to 12 and there's at least 1 accepted number, switching to stage 2.", moduleId);
             stage = 2;
             timerText.text = acceptedNumbers.Count.ToString();
             if (timerText.text.Length == 2)
@@ -116,7 +116,6 @@ public class RememberMeNowScript : MonoBehaviour
             {
                 Debug.LogFormat("[Remember Me Now #{0}] The current number to submit is {1}.", moduleId, acceptedNumbers[0]);
             }
-            Debug.LogFormat("[Remember Me Now #{0}] ", moduleId);
             yield break;
         }
 
@@ -372,6 +371,8 @@ public class RememberMeNowScript : MonoBehaviour
                     }
                     else
                     {
+                        Debug.LogFormat("[Remember Me Now #{0}] {1} submitted incorrectly, incurring strike.", moduleId, displayText.text);
+
                         displayText.text = "----";
                         currentTypingIndex = 0;
 
@@ -407,6 +408,8 @@ public class RememberMeNowScript : MonoBehaviour
                     }
                     else
                     {
+                        Debug.LogFormat("[Remember Me Now #{0}] {1} submitted incorrectly, incurring strike.", moduleId, displayText.text);
+
                         displayText.text = "----";
                         currentTypingIndex = 0;
 
@@ -539,13 +542,70 @@ public class RememberMeNowScript : MonoBehaviour
         }
     }
 
-    void TwitchHandleForcedSolve()
+    IEnumerator TwitchHandleForcedSolve()
     {
-        StopCoroutine(timerRef);
-        timerText.text = "---";
-        displayText.text = "----";
-        moduleSolved = true;
-        StartCoroutine(PassAnimation());
-        bombModuleRef.HandlePass();
+        //While in stage 1 accept valid numbers, reject invalid numbers
+        while (stage == 1)
+        {
+            yield return null;
+
+            //If statement waits for the module to be ready for input before attempting to press a button
+            if (timerText.text != "---")
+            {
+                yield return new WaitForSecondsRealtime(0.1f);
+
+                buttons[isValidNumber ? 10 : 11].OnInteract();
+            }
+        }
+
+        int numberToSubmit;
+        string tempString;
+
+        while (stage == 2 && acceptedNumbers.Count > 0)
+        {
+            yield return null;
+
+            //Empties the display in case there was already input
+            if (displayText.text != "----")
+            {
+                buttons[11].OnInteract();
+            }
+
+            //If there's still accepted numbers left, continue
+            if (acceptedNumbers.Count > 0)
+            {
+                //Calculates the number to submit based on if there's rejected numbers left
+                if (rejectedNumbers.Count > 0)
+                {
+                    numberToSubmit = Mathf.Abs(acceptedNumbers[0] - rejectedNumbers[0]);
+                }
+                else
+                {
+                    numberToSubmit = acceptedNumbers[0];
+                }
+
+                //Adds leading zeros if needed
+                tempString = numberToSubmit.ToString("0000");
+
+                //Enters the number one digit at a time
+                for (int i = 0; i < 4; i++)
+                {
+                    yield return new WaitForSecondsRealtime(0.1f);
+
+                    if (tempString[i] != '0')
+                    {
+                        buttons[int.Parse(tempString[i].ToString()) - 1].OnInteract();
+                    }
+                    else
+                    {
+                        buttons[9].OnInteract();
+                    }
+                }
+
+                yield return new WaitForSecondsRealtime(0.1f);
+
+                buttons[10].OnInteract();
+            }
+        }
     }
 }
